@@ -1,5 +1,5 @@
 .. image:: https://bytebucket.org/emitc2h/sivega/raw/e55115b06e73953f2fbafa708884c9d52cf26d4a/logo.png?token=5a8b0da1aaff86b72545802873fd3540a4e3055e
-   :scale: 30
+   :scale: 50 %
 
 | **project:** sivega 0.0
 | **author:** Michel Trottier-McDonald <mtrottiermcdonald@lbl.gov>
