@@ -1,0 +1,2 @@
+CairoSVG: http://cairosvg.org/, sudo port install py27-cairosvg
+lxml: http://lxml.de/, sudo port install py27-lxml
