@@ -1,11 +1,11 @@
 .. image:: https://bytebucket.org/emitc2h/sivega/raw/e55115b06e73953f2fbafa708884c9d52cf26d4a/logo.png?token=5a8b0da1aaff86b72545802873fd3540a4e3055e
-   :scale: 50
+   :scale: 30
 
-project       : sivega 0.0
-author        : Michel Trottier-McDonald <mtrottiermcdonald@lbl.gov>
-creation date : December 2014
+| *project:* sivega 0.0
+| *author:* Michel Trottier-McDonald <mtrottiermcdonald@lbl.gov>
+| *creation date:* December 2014
 
-Project proposal:
+*Project proposal:*
 
 Sivega is a future python library providing full style control and flexibility for ROOT histogram
 classes. It produces the graphical data directly into SVG, and uses the cairo engine to render
