@@ -1,4 +1,4 @@
-   image:: https://bytebucket.org/emitc2h/sivega/raw/ed9296436da3a1198f052459653a741e661ea388/logo.png
+.. image:: https://bytebucket.org/emitc2h/sivega/raw/ed9296436da3a1198f052459653a741e661ea388/logo.png
    :scale: 50
 
 project       : sivega 0.0
