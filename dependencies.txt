@@ -1,2 +1,3 @@
 CairoSVG: http://cairosvg.org/, sudo port install py27-cairosvg ## Not satisfactory
 lxml: http://lxml.de/, sudo port install py27-lxml
+ROOT: http://root.cern.ch sudo port install root-*
