@@ -3,7 +3,7 @@
 # author : Michel Trottier-McDonald                #
 # date   : December 2014                           #
 # description:                                     #
-# An axis that goes on the edge of a box           #
+# Utilities to manipulate ROOT TH1Fs               #
 #**************************************************#
 
 #############################################################################
@@ -53,3 +53,29 @@ def copy_empty(th1f, label='empty', variable_binning=False):
     
         return ROOT.TH1F('{0}_{1}_{2}'.format(name, label, unique_label()), '', nbins, xlo, xhi)
 
+
+
+
+## ================================================
+def consistent_binning(th1f_i, th1f_j, variable_binning=False):
+    """
+    Checks that two histograms have consistent binnings
+    """
+
+    if not variable_binning:
+        nbins_i = th1f_i.GetNbinsX()
+        axis_i  = th1f_i.GetXaxis()
+        xlo_i   = axis_i.GetBinLowEdge(1)
+        xhi_i   = axis_i.GetBinUpEdge(nbins)
+
+        nbins_j = th1f_j.GetNbinsX()
+        axis_j  = th1f_j.GetXaxis()
+        xlo_j   = axis_j.GetBinLowEdge(1)
+        xhi_j   = axis_j.GetBinUpEdge(nbins)
+
+        if (nbins_i == nbins_j) and \
+            (xlo_i == x_lo_j) and \
+            (xhi_i == xhi_j):
+            return True
+        else:
+            return False

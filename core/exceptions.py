@@ -1,9 +1,9 @@
 #**************************************************#
-# file   : element.py                              #
+# file   : exceptions.py                           #
 # author : Michel Trottier-McDonald                #
 # date   : December 2014                           #
 # description:                                     #
-# A base class for a graphical element             #
+# A library of exceptions for sivega               #
 #**************************************************#
 
 #############################################################################
@@ -25,51 +25,26 @@
 #   along with sivega.  If not, see <http://www.gnu.org/licenses/>.         #
 #############################################################################
 
-from lxml import etree
+####################################################
+class Error(Exception):
+    """
+    A base class for exceptions specific to Sivega
+    """
+    pass
+
+
 
 ####################################################
-class Element(list):
+class InconsistentBinningError(Error):
+    """
+    An error thrown by the Histogram class when th1fs
+    with inconsistent binnings are provided
+    """
 
     ## ------------------------------------------
-    def __init__(self, *args, **kwargs):
+    def __init__(self, expr, msg):
         """
         Constructor
         """
-
-        self.xml = etree.Element(*args, **kwargs)
-
-
-
-
-    ## ------------------------------------------
-    def string(self):
-        """
-        Dump a string containing the xml code for this element and all it contains
-        """
-
-        return etree.tostring(self.xml, pretty_print=True)
-
-
-
-
-    ## -------------------------------------------
-    def add(self, element):
-        """
-        Add an element to the current element
-        """
-
-        self.append(element)
-
-
-
-
-    ## -------------------------------------------
-    def update_xml(self):
-        """
-        Updates the xml representation
-        """
-
-        for element in self:
-            element.render_xml()
-            self.xml.append(element.xml)
-
+        self.expr = expr
+        self.msg = msg
