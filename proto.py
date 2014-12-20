@@ -23,4 +23,6 @@ th1f_gaus.FillRandom('gaus', 10000)
 
 h_gaus = Histogram('gaussian-test', 'arbitrary units')
 h_gaus.add(th1f_gaus, 'gaussian')
+h_gaus.draw('hgaus', 'png')
+h_gaus.draw('hgaus', 'svg')
 

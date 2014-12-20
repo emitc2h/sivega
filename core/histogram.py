@@ -79,7 +79,7 @@ class Stack(list):
 class Histogram(list):
 
     ## ------------------------------------------
-    def __init__(self, name, xtitle='', ytitle='Yields'):
+    def __init__(self, name, xtitle='', ytitle='Yields', *args, **kwargs):
         """
         Constructor
         """
@@ -92,7 +92,9 @@ class Histogram(list):
         self.xtitle = xtitle
         self.ytitle = ytitle
 
-        self.canvas = Canvas()
+        self.canvas = canvas.Canvas(*args, **kwargs)
+        self.plotbox = plotbox.PlotBox(self.canvas)
+        self.canvas.add(self.plotbox)
 
 
     ## -------------------------------------------
@@ -123,6 +125,15 @@ class Histogram(list):
 
         new_stack = Stack(new_component)
         self.append(new_stack)
+
+
+    ## -------------------------------------------
+    def draw(self, *args, **kwargs):
+        """
+        Draws the current histogram to file
+        """
+
+        self.canvas.draw(*args, **kwargs)
 
 
 

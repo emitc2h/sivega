@@ -39,17 +39,14 @@ class Element(list):
         self.xml = etree.Element(*args, **kwargs)
 
 
-
-
     ## ------------------------------------------
     def string(self):
         """
         Dump a string containing the xml code for this element and all it contains
         """
 
+        self.update_xml()
         return etree.tostring(self.xml, pretty_print=True)
-
-
 
 
     ## -------------------------------------------
@@ -61,8 +58,6 @@ class Element(list):
         self.append(element)
 
 
-
-
     ## -------------------------------------------
     def update_xml(self):
         """
@@ -70,6 +65,35 @@ class Element(list):
         """
 
         for element in self:
-            element.render_xml()
+            element.update_xml()
             self.xml.append(element.xml)
+
+
+    ## --------------------------------------------
+    def compile_style(self, **kwargs):
+        """
+        Compiles the style of the element
+        """
+
+        style_strings = []
+
+        for key,value in kwargs.iteritems():
+            style_strings.append('{0}:{1}'.format(key.replace('_', '-'), value))
+
+        self.xml.attrib['style'] = '; '.join(style_strings)
+
+
+    ## --------------------------------------------
+    def compile_transform(self, **kwargs):
+        """
+        Compiles the transform of the element
+        """
+
+        transform_strings = []
+
+        for key,value in kwargs.iteritems():
+            transform_strings.append('{0}({1})'.format(key, value))
+
+        self.xml.attrib['transform'] = ' '.join(transform_strings)
+
 

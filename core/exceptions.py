@@ -48,3 +48,22 @@ class InconsistentBinningError(Error):
         """
         self.expr = expr
         self.msg = msg
+
+
+
+####################################################
+class OutputTypeError(Error):
+    """
+    An error thrown by Canvas when the output type
+    provided is wrong
+    """
+
+    ## ------------------------------------------
+    def __init__(self, expr, msg):
+        """
+        Constructor
+        """
+        self.expr = expr
+        self.msg = msg
+
+        
