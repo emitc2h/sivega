@@ -41,6 +41,8 @@ class Canvas(Element):
         Constructor
         """
 
+        self.type = 'canvas'
+
         self.width            = width
         self.height           = height
         self.background_color = background_color

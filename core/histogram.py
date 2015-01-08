@@ -25,7 +25,7 @@
 #   along with sivega.  If not, see <http://www.gnu.org/licenses/>.         #
 #############################################################################
 
-from elements import canvas, plotbox
+from elements import canvas, plotbox, distribution
 from styles import color
 from utilities import th1futils
 import exceptions
@@ -46,6 +46,7 @@ class Component:
         self.fill         = fill
         self.stroke_color = stroke_color
         self.stroke       = stroke
+        self.distribution = distribution.Distribution()
 
 
 
@@ -71,6 +72,23 @@ class Stack(list):
         """
 
         self.append(component)
+        self.sum.Add(component.th1f)
+
+
+    ## ------------------------------------------
+    def max(self):
+        """
+        Gets maximum value for the stack
+        """
+
+        maximum = -float('inf')
+
+        for i in range(self.sum.GetNbinsX()):
+            bin_max = self.sum.GetBinContent(i+1) + self.sum.GetBinError(i+1)
+            if bin_max > maximum:
+                maximum = bin_max
+
+        return maximum
 
 
 
@@ -85,7 +103,7 @@ class Histogram(list):
         """
 
         self.name    = name
-        self.binning = None
+        self.binning = []
         self.xlo     = None
         self.xhi     = None
 
@@ -103,11 +121,22 @@ class Histogram(list):
         Add a th1f to the histogram
         """
 
+        ## Check first if TH1Fs are already present, that the binning is consistent
         if len(self):
             for my_stack in self:
                 for my_component in my_stack:
                     if not th1futils.consistent_binning(my_component.th1f, th1f):
                         raise exceptions.InconsistentBinningError('new ROOT.TH1F labelled {0} has different binning than other ROOT.TH1Fs already present in Histogram {1}'.format(label, self.name))
+
+        ## If TH1Fs are not present, obtain binning configuration from first TH1F
+        else:
+            nbins = th1f.GetNbinsX()
+            axis  = th1f.GetXaxis()
+            self.xlo   = axis.GetBinLowEdge(1)
+            self.xhi   = axis.GetBinUpEdge(nbins)
+
+            for i in range(nbins+1):
+                self.binning.append((axis.GetBinLowEdge(i), axis.GetBinUpEdge(i)))
 
         new_component = Component(
                                 th1f,
@@ -127,11 +156,38 @@ class Histogram(list):
         self.append(new_stack)
 
 
+    ## ------------------------------------------
+    def max(self):
+        """
+        Gets maximum value for the stack
+        """
+
+        maximum = -float('inf')
+
+        for stack in self:
+            stack_max = stack.max()
+            if stack_max > maximum:
+                maximum = stack_max
+
+        return maximum
+
+
     ## -------------------------------------------
     def draw(self, *args, **kwargs):
         """
         Draws the current histogram to file
         """
+
+        for stack in self:
+            for component in stack:
+                for i, bin in enumerate(self.binning):
+                    bin_content = component.th1f.GetBinContent(i+1)
+                    bin_error   = component.th1f.GetBinError(i+1)
+                    component.distribution.add_bin(bin[0], bin[1], bin_content, bin_error)
+                    component.distribution.calculate_line()
+                    self.plotbox.add(component.distribution)
+
+        self.plotbox.calculate_plotting_transform()
 
         self.canvas.draw(*args, **kwargs)
 

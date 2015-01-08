@@ -35,3 +35,5 @@ class Axis(Element):
         """
         Constructor
         """
+
+        self.type = 'axis'

@@ -36,7 +36,8 @@ class Element(list):
         Constructor
         """
 
-        self.xml = etree.Element(*args, **kwargs)
+        self.xml  = etree.Element(*args, **kwargs)
+        self.type = None
 
 
     ## ------------------------------------------
@@ -55,7 +56,10 @@ class Element(list):
         Add an element to the current element
         """
 
-        self.append(element)
+        if isinstance(element, Element):
+            self.append(element)
+        else:
+            raise TypeError('object {0} is not of type Element'.format(element.__class__))
 
 
     ## -------------------------------------------
