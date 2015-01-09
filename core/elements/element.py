@@ -1,9 +1,9 @@
 #**************************************************#
-# file   : element.py                              #
+# file   : core/elements/element.py                #
 # author : Michel Trottier-McDonald                #
 # date   : December 2014                           #
 # description:                                     #
-# A base class for a graphical element             #
+# A base class for an xml element                  #
 #**************************************************#
 
 #############################################################################
@@ -26,18 +26,22 @@
 #############################################################################
 
 from lxml import etree
+from ..coordinates import absolute_origin, absolute_transform
 
 ####################################################
 class Element(list):
 
     ## ------------------------------------------
-    def __init__(self, *args, **kwargs):
+    def __init__(self, xml=None, type=None):
         """
         Constructor
         """
 
-        self.xml  = etree.Element(*args, **kwargs)
-        self.type = None
+        self.xml  = xml
+        self.type = type
+
+        self.origin    = absolute_origin
+        self.transform = absolute_transform
 
 
     ## ------------------------------------------
@@ -46,7 +50,7 @@ class Element(list):
         Dump a string containing the xml code for this element and all it contains
         """
 
-        self.update_xml()
+        self.render_xml()
         return etree.tostring(self.xml, pretty_print=True)
 
 
@@ -63,13 +67,14 @@ class Element(list):
 
 
     ## -------------------------------------------
-    def update_xml(self):
+    def render_xml(self):
         """
         Updates the xml representation
         """
 
+        del self.xml[:]
         for element in self:
-            element.update_xml()
+            element.render_xml()
             self.xml.append(element.xml)
 
 
@@ -85,19 +90,3 @@ class Element(list):
             style_strings.append('{0}:{1}'.format(key.replace('_', '-'), value))
 
         self.xml.attrib['style'] = '; '.join(style_strings)
-
-
-    ## --------------------------------------------
-    def compile_transform(self, **kwargs):
-        """
-        Compiles the transform of the element
-        """
-
-        transform_strings = []
-
-        for key,value in kwargs.iteritems():
-            transform_strings.append('{0}({1})'.format(key, value))
-
-        self.xml.attrib['transform'] = ' '.join(transform_strings)
-
-

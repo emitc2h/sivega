@@ -1,9 +1,10 @@
 #**************************************************#
-# file   : canvas.py                               #
+# file   : core/elements/canvas.py                 #
 # author : Michel Trottier-McDonald                #
 # date   : December 2014                           #
 # description:                                     #
-# A canvas to house one or more boxes              #
+# A canvas to house graphical elements, provides   #
+# the <svg> element in the xml tree                #
 #**************************************************#
 
 #############################################################################
@@ -29,7 +30,13 @@ from lxml import etree
 import cairosvg
 
 from element import Element
+
+from ..coordinates.transform import Transform, linear_flat, linear_invert
+from ..coordinates.origin import Origin
+from ..coordinates import absolute_origin, absolute_transform
+
 from ..styles import color
+
 import exceptions
 
 ####################################################
@@ -47,51 +54,41 @@ class Canvas(Element):
         self.height           = height
         self.background_color = background_color
 
-        self.svg = etree.Element('svg')
-        super(Canvas, self).__init__('g')
-        self.background = etree.Element('rect')
+        absolute_origin    = Origin(x=0, y=self.height)
+        absolute_transform = Transform(x=linear_flat, y=linear_invert)
 
-        self.xml.append(self.background)
-        self.svg.append(self.xml)
-
-
-
-    ## --------------------------------------------
-    def compile_style(self, **kwargs):
-        """
-        Compiles the style of the element
-        """
-
-        style_strings = []
-
-        for key,value in kwargs.iteritems():
-            style_strings.append('{0}:{1}'.format(key.replace('_', '-'), value))
-
-        self.background.attrib['style'] = ' ;'.join(style_strings)
-
+        self.origin    = absolute_origin
+        self.transform = absolute_transform
 
 
     ## ------------------------------------------
-    def update_xml(self):
+    def render_xml(self):
         """
         Updates the xml data
         """
+
+        self.xml = etree.Element('g')
+        self.background = Element(etree.Element('rect'))
+
+        self.append(self.background)
+
+        self.background.xml.attrib['x']      = '0'
+        self.background.xml.attrib['y']      = '0'
+        self.background.xml.attrib['width']  = '{0}'.format(self.width)
+        self.background.xml.attrib['height'] = '{0}'.format(self.height)
+
+        self.compile_style(fill='{0}'.format(self.background_color))
+
+        super(Canvas, self).render_xml()
+
+        self.svg = etree.Element('svg')
 
         self.svg.attrib['width']   = '{0}'.format(self.width)
         self.svg.attrib['height']  = '{0}'.format(self.height)
         self.svg.attrib['viewBox'] = '0 0 {0} {1}'.format(self.width, self.height)
         self.svg.attrib['xmlns']   =  'http://www.w3.org/2000/svg'
 
-        self.compile_transform(scale='1,-1', translate='0,{0}'.format(self.height))
-
-        self.background.attrib['x']      = '0'
-        self.background.attrib['y']      = '0'
-        self.background.attrib['width']  = '{0}'.format(self.width)
-        self.background.attrib['height'] = '{0}'.format(self.height)
-
-        self.compile_style(fill='{0}'.format(self.background_color))
-
-        super(Canvas, self).update_xml()
+        self.svg.append(self.xml)
 
 
     ## ------------------------------------------
@@ -100,7 +97,7 @@ class Canvas(Element):
         Dump a string containing the xml code for this element and all it contains
         """
 
-        self.update_xml()
+        self.render_xml()
         return etree.tostring(self.svg, pretty_print=True)
 
 
@@ -128,5 +125,3 @@ class Canvas(Element):
         else:
             raise exceptions.OutputTypeError('The provided output type (\'{0}\') is unavailable. \'pdf\', \'png\', \'ps\', and \'svg\' are the available types.')
             return
-
-
