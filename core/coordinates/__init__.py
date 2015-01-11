@@ -32,11 +32,3 @@
 ##
 ## > Example 4: Using a periodic coordinate system:
 ##     - 
-
-## Define absolute system of coordinates
-
-from origin    import Origin
-from transform import Transform, linear
-
-absolute_origin    = Origin()
-absolute_transform = Transform()

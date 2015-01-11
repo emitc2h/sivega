@@ -33,7 +33,6 @@ from element import Element
 
 from ..coordinates.transform import Transform, linear_flat, linear_invert
 from ..coordinates.origin import Origin
-from ..coordinates import absolute_origin, absolute_transform
 
 from ..styles import color
 
@@ -48,7 +47,7 @@ class Canvas(Element):
         Constructor
         """
 
-        self.type = 'canvas'
+        super(Canvas, self).__init__(type='canvas')
 
         self.width            = width
         self.height           = height
@@ -57,8 +56,8 @@ class Canvas(Element):
         absolute_origin    = Origin(x=0, y=self.height)
         absolute_transform = Transform(x=linear_flat, y=linear_invert)
 
-        self.origin    = absolute_origin
-        self.transform = absolute_transform
+        self.origin    = Origin(x=0, y=self.height)
+        self.transform = Transform(x=linear_flat, y=linear_invert)
 
 
     ## ------------------------------------------
@@ -68,9 +67,8 @@ class Canvas(Element):
         """
 
         self.xml = etree.Element('g')
-        self.background = Element(etree.Element('rect'))
-
-        self.append(self.background)
+        self.background = Element(etree.Element('rect'), type='background')
+        self.insert(0,self.background)
 
         self.background.xml.attrib['x']      = '0'
         self.background.xml.attrib['y']      = '0'
@@ -78,6 +76,8 @@ class Canvas(Element):
         self.background.xml.attrib['height'] = '{0}'.format(self.height)
 
         self.compile_style(fill='{0}'.format(self.background_color))
+
+        self.set_absolute_coord()
 
         super(Canvas, self).render_xml()
 

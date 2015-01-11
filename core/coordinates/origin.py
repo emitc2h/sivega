@@ -39,7 +39,7 @@ class Origin(object):
             self.y = y
         elif origin is None:
             self.x, self.y = transform.apply(x, y)
-        elif scaling is None:
+        elif transform is None:
             self.x = origin.x + x
             self.y = origin.y + y
         else:

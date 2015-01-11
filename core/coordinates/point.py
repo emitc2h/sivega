@@ -25,14 +25,14 @@
 #   along with sivega.  If not, see <http://www.gnu.org/licenses/>.         #
 #############################################################################
 
-import absolute_origin
-import absolute_transform
+from origin import Origin
+from transform import Transform
 
 ####################################################
 class Point(object):
 
     ## ------------------------------------------
-    def __init__(self, x, y, origin=absolute_origin, transform=absolute_transform):
+    def __init__(self, x, y, origin=Origin(), transform=Transform()):
         """
         Constructor
         """
@@ -43,12 +43,12 @@ class Point(object):
         self.origin    = origin
         self.transform = transform
 
-        self.absolute_origin  = absolute_origin
-        self.absolute_transform = absolute_transform
+        self.absolute_origin  = None
+        self.absolute_transform = None
 
 
     ## ------------------------------------------
-    def get():
+    def get(self):
         """
         return the coordinates as provided originally
         """
@@ -57,7 +57,7 @@ class Point(object):
 
 
     ## ------------------------------------------
-    def get_absolute():
+    def get_absolute(self):
         """
         return the coordinates in the absolute coordinate system
         """
@@ -67,10 +67,25 @@ class Point(object):
 
 
     ## ------------------------------------------
-    def get_render():
+    def get_render(self):
         """
         return the coordinates for the final render, in svg coordinates
         """
 
         x_prime, y_prime = self.absolute_transform.apply(*self.get_absolute())
         return x_prime + self.absolute_origin.x, y_prime + self.absolute_origin.y
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

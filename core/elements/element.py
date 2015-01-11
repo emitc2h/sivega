@@ -26,7 +26,8 @@
 #############################################################################
 
 from lxml import etree
-from ..coordinates import absolute_origin, absolute_transform
+from ..coordinates.origin import Origin
+from ..coordinates.transform import Transform
 
 ####################################################
 class Element(list):
@@ -40,8 +41,8 @@ class Element(list):
         self.xml  = xml
         self.type = type
 
-        self.origin    = absolute_origin
-        self.transform = absolute_transform
+        self.origin    = Origin()
+        self.transform = Transform()
 
 
     ## ------------------------------------------
@@ -90,3 +91,19 @@ class Element(list):
             style_strings.append('{0}:{1}'.format(key.replace('_', '-'), value))
 
         self.xml.attrib['style'] = '; '.join(style_strings)
+
+
+    ## --------------------------------------------
+    def set_absolute_coord(self):
+        """
+        pass down the current coordinate system to all points, establishing
+        it as the absolute coordinate system
+        """ 
+
+        for element in self:
+            if element.type == 'basic':
+                for point in element.points:
+                    point.absolute_origin    = self.origin
+                    point.absolute_transform = self.transform
+            else:
+                element.set_absolute_coord()

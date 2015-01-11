@@ -48,7 +48,7 @@ class Function(object):
         """
         Evaluate the function
         """
-        return function(x, *self.parameters)
+        return self.function(x, *self.parameters)
 
 
 
