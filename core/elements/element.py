@@ -1,13 +1,13 @@
 #**************************************************#
 # file   : core/elements/element.py                #
 # author : Michel Trottier-McDonald                #
-# date   : December 2014                           #
+# date   : February 2015                           #
 # description:                                     #
 # A base class for an xml element                  #
 #**************************************************#
 
 #############################################################################
-#   Copyright 2014-2015 Michel Trottier-McDonald                            #
+#   Copyright 2015 Michel Trottier-McDonald                                 #
 #                                                                           #
 #   This file is part of sivega.                                            #
 #                                                                           #
@@ -26,84 +26,16 @@
 #############################################################################
 
 from lxml import etree
-from ..coordinates.origin import Origin
-from ..coordinates.transform import Transform
 
 ####################################################
 class Element(list):
 
     ## ------------------------------------------
-    def __init__(self, xml=None, type=None):
+    def __init__(self):
         """
         Constructor
         """
 
-        self.xml  = xml
-        self.type = type
+        self.xml = None
 
-        self.origin    = Origin()
-        self.transform = Transform()
-
-
-    ## ------------------------------------------
-    def string(self):
-        """
-        Dump a string containing the xml code for this element and all it contains
-        """
-
-        self.render_xml()
-        return etree.tostring(self.xml, pretty_print=True)
-
-
-    ## -------------------------------------------
-    def add(self, element):
-        """
-        Add an element to the current element
-        """
-
-        if isinstance(element, Element):
-            self.append(element)
-        else:
-            raise TypeError('object {0} is not of type Element'.format(element.__class__))
-
-
-    ## -------------------------------------------
-    def render_xml(self):
-        """
-        Updates the xml representation
-        """
-
-        del self.xml[:]
-        for element in self:
-            element.render_xml()
-            self.xml.append(element.xml)
-
-
-    ## --------------------------------------------
-    def compile_style(self, **kwargs):
-        """
-        Compiles the style of the element
-        """
-
-        style_strings = []
-
-        for key,value in kwargs.iteritems():
-            style_strings.append('{0}:{1}'.format(key.replace('_', '-'), value))
-
-        self.xml.attrib['style'] = '; '.join(style_strings)
-
-
-    ## --------------------------------------------
-    def set_absolute_coord(self):
-        """
-        pass down the current coordinate system to all points, establishing
-        it as the absolute coordinate system
-        """ 
-
-        for element in self:
-            if element.type == 'basic':
-                for point in element.points:
-                    point.absolute_origin    = self.origin
-                    point.absolute_transform = self.transform
-            else:
-                element.set_absolute_coord()
+        self.parent = None
