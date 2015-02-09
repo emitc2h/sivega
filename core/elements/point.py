@@ -1,5 +1,5 @@
 #**************************************************#
-# file   : core/elements/canvas.py                 #
+# file   : core/elements/point.py                  #
 # author : Michel Trottier-McDonald                #
 # date   : February 2015                           #
 # description:                                     #
@@ -25,20 +25,22 @@
 #   along with sivega.  If not, see <http://www.gnu.org/licenses/>.         #
 #############################################################################
 
-from lxml import etree
-
-from box import Box
-
 ####################################################
-class Canvas(Box):
+class Point(object):
 
     ## ------------------------------------------
-    def __init__(self, width, height):
+    def __init__(self, x, y, system='abs'):
         """
         Constructor
         """
 
-        self.width  = width
-        self.height = height
+        ## Coordinates specified in coordinate system of choice
+        self.x = x
+        self.y = y
 
-        super(Canvas, self).__init__(0, 0, width, height)
+        ## Coordinate system for x & y
+        self.system = system
+
+        ## Corresponding absolute coordinates, calculated during rendering
+        self.abs_x = None
+        self.abs_y = None

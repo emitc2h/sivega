@@ -28,7 +28,7 @@
 from lxml import etree
 
 ####################################################
-class Element(list):
+class Element(object):
 
     ## ------------------------------------------
     def __init__(self):
@@ -39,3 +39,10 @@ class Element(list):
         self.xml = None
 
         self.parent = None
+
+
+    ## ------------------------------------------
+    def render(self):
+        """
+        To be implemented by child classes
+        """

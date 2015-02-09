@@ -27,38 +27,73 @@
 
 from lxml import etree
 
-from element import Element
-
 ####################################################
-class Box(Element):
+class Box(Element, List):
+
 
     ## ------------------------------------------
-    def __init__(self, x0,y0, x1,y1):
+    def __init__(self, x0,y0, x1,y1, parent=None):
         """
         Constructor
         """
 
+        ## Initialize Element
         super(Box, self).__init__()
+
+        ## Link to parent box
+        self.parent = parent
 
         self.x0 = x0
         self.y0 = y0
         self.x1 = x1
         self.y1 = y1
 
+        ## Specify basic coordinate systems
         self.coordinates = {
                             'rel' : ((0,0), (1,1)),
-                            'abs' : ((x0,y0), (x1,y1)),
-                            'scl' : ((x0,y0), (x1,y1))
+                            'abs' : ((x0,y0), (x1,y1))
                             }
+
+        ## List of primitives
+        self.primitives = []
 
 
     ## ------------------------------------------
-    def set_scl(x0,y0, x1,y1):
+    def add_scaled_coordinate_system(name, x0,y0, x1,y1):
         """
         Set the scaled coordinate system
         """
 
-        self.coordinates['scl'] = ((x0,y0),(x1,y1))
+        self.coordinates[name] = ((x0,y0),(x1,y1))
+
+
+    ## ------------------------------------------
+    def render_point_coordinates(self):
+        """
+        Returns the absolute coordinates corresponding to the given point
+        """
+
+        for primitive in self.primitives:
+            for point in primitive.points:
+
+                x0_abs = self.coordinates['abs'][0][0]
+                y0_abs = self.coordinates['abs'][0][1]
+                x1_abs = self.coordinates['abs'][1][0]
+                y1_abs = self.coordinates['abs'][1][1]
+
+                x0_point = self.coordinates[point.system][0][0]
+                y0_point = self.coordinates[point.system][0][1]
+                x1_point = self.coordinates[point.system][1][0]
+                y1_point = self.coordinates[point.system][1][1]
+
+                a = (x1_abs - x0_abs) / (x1_point - x0_point)
+                b = (x1_point*x0_abs - x0_point*x1_abs) / (x1_point - x0_point)
+
+                c = (y1_abs - y0_abs) / (y1_point - y0_point)
+                d = (y1_point*y0_abs - y0_point*y1_abs) / (y1_point - y0_point)
+
+                point.abs_x = a*point.x + b
+                point.abs_y = c*point.y + d
 
 
     ## ------------------------------------------

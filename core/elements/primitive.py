@@ -1,5 +1,5 @@
 #**************************************************#
-# file   : core/elements/canvas.py                 #
+# file   : core/elements/primitive.py              #
 # author : Michel Trottier-McDonald                #
 # date   : February 2015                           #
 # description:                                     #
@@ -26,19 +26,15 @@
 #############################################################################
 
 from lxml import etree
-
-from box import Box
+from element import Element
 
 ####################################################
-class Canvas(Box):
+class Primitive(Element):
 
     ## ------------------------------------------
-    def __init__(self, width, height):
+    def __init__(self):
         """
         Constructor
         """
 
-        self.width  = width
-        self.height = height
-
-        super(Canvas, self).__init__(0, 0, width, height)
+        self.points = []
