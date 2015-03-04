@@ -26,10 +26,11 @@
 #############################################################################
 
 from lxml import etree
-from ..style import color
+from element import Element
+from ..styles import color
 
 ####################################################
-class Box(Element, List):
+class Box(Element, list):
 
 
     ## ------------------------------------------
@@ -133,25 +134,31 @@ class Box(Element, List):
         width/height a subbox can take
         """
 
+        subbox_array = []
+
         width = float(self.x1 - self.x0)
         height = float(self.y1 - self.y0)
 
         subbox_width  = width/columns
         subbox_height = height/rows
 
-        for i in columns:
-            for j in rows:
+        for i in range(columns):
+            for j in range(rows):
 
-                x0 = subbox_width*i + left_margin * subbox_width
-                y0 = subbox_width*(i+1) - right_margin * subbox_width
+                x0 = subbox_width*i + left_margin * subbox_width + self.x0
+                x1 = subbox_width*(i+1) - right_margin * subbox_width + self.x0
 
-                y0 = (height - subbox_height*(j+1)) + bottom_margin * subbox_height
-                y1 = (height - subbox_height*j)     - top_margin * subbox_height
+                y0 = (height - subbox_height*(j+1)) + bottom_margin * subbox_height + self.y0
+                y1 = (height - subbox_height*j)     - top_margin * subbox_height + self.y0
 
                 subbox = Box(x0,y0, x1,y1)
                 subbox.parent = self
 
                 self.append(subbox)
+
+                subbox_array.append(subbox)
+
+        return subbox_array
 
 
     ## ------------------------------------------
@@ -161,22 +168,22 @@ class Box(Element, List):
         """
 
         ## Creates the group that will contain everything in the box
-        self.xml = etree.element('g')
+        self.xml = etree.Element('g')
 
         ## Creates the background rectangle
-        background = etree.element('rect')
+        background = etree.Element('rect')
 
         ## Set background attributes
-        background.attrib['x']      = self.x0
-        background.attrib['y']      = self.y0
-        background.attrib['width']  = self.x1 - self.x0
-        background.attrib['height'] = self.y1 - self.y0
+        background.attrib['x']      = str(self.x0)
+        background.attrib['y']      = str(self.y0)
+        background.attrib['width']  = str(self.x1 - self.x0)
+        background.attrib['height'] = str(self.y1 - self.y0)
 
         background.attrib['fill'] = self.fill
         if not self.stroke is None:
             background.attrib['stroke'] = self.stroke
             if not self.stroke_width is None:
-                background.attrib['stroke-width'] = self.stroke_width
+                background.attrib['stroke-width'] = str(self.stroke_width)
 
         ## Append background first in the group (such that it IS the background to everything else)
         self.xml.append(background)

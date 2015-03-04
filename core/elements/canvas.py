@@ -33,7 +33,7 @@ from box import Box
 class Canvas(Box):
 
     ## ------------------------------------------
-    def __init__(self, width, height):
+    def __init__(self, width=800, height=600):
         """
         Constructor
         """
@@ -51,26 +51,28 @@ class Canvas(Box):
         """
 
         ## Creates the group that will contain everything in the box
-        self.xml = etree.element('svg')
-        self.xml.attrib['width']  = self.width
-        self.xml.attrib['height'] = self.height
+        self.xml = etree.Element('svg')
+        self.xml.attrib['width']  = str(self.width)
+        self.xml.attrib['height'] = str(self.height)
+        self.xml.attrib['viewbox'] = '0 0 {0} {1}'.format(self.width, self.height)
+        self.xml.attrib['xmlns'] = 'http://www.w3.org/2000/svg'
 
         ## Collect definitions
 
         ## Creates the background rectangle
-        background = etree.element('rect')
+        background = etree.Element('rect')
 
         ## Set background attributes
-        background.attrib['x']      = self.x0
-        background.attrib['y']      = self.y0
-        background.attrib['width']  = self.x1 - self.x0
-        background.attrib['height'] = self.y1 - self.y0
+        background.attrib['x']      = '0'
+        background.attrib['y']      = '0'
+        background.attrib['width']  = str(self.width)
+        background.attrib['height'] = str(self.height)
 
         background.attrib['fill'] = self.fill
         if not self.stroke is None:
             background.attrib['stroke'] = self.stroke
             if not self.stroke_width is None:
-                background.attrib['stroke-width'] = self.stroke_width
+                background.attrib['stroke-width'] = str(self.stroke_width)
 
         ## Append background first in the group (such that it IS the background to everything else)
         self.xml.append(background)
@@ -97,6 +99,10 @@ class Canvas(Box):
         self.render()
 
         if extension == 'svg':
-            output_file = open('{0}.{1}'.format(name, extension))
-            
+            output_file = open('{0}.{1}'.format(name, extension), 'w')
+            output_file.write(etree.tostring(self.xml))
+            output_file.close()
+        else:
+            print 'File not produced. Extension {0} unknown.'.format(extension)
+
 
