@@ -38,3 +38,4 @@ class Primitive(Element):
         """
 
         self.points = []
+

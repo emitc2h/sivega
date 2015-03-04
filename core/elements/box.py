@@ -26,6 +26,7 @@
 #############################################################################
 
 from lxml import etree
+from ..style import color
 
 ####################################################
 class Box(Element, List):
@@ -57,9 +58,14 @@ class Box(Element, List):
         ## List of primitives
         self.primitives = []
 
+        ## graphical attributes
+        self.fill   = color.white
+        self.stroke = None
+        self.stroke_width = None
+
 
     ## ------------------------------------------
-    def add_scaled_coordinate_system(name, x0,y0, x1,y1):
+    def add_scaled_coordinate_system(self, name, x0,y0, x1,y1):
         """
         Set the scaled coordinate system
         """
@@ -97,7 +103,7 @@ class Box(Element, List):
 
 
     ## ------------------------------------------
-    def create_subbox(left_margin=0, right_margin=0, bottom_margin=0, top_margin=0):
+    def create_subbox(self, left_margin=0, right_margin=0, bottom_margin=0, top_margin=0):
         """
         Creates a sub-box, margins are specified as fractions of total width/height
         """
@@ -121,7 +127,7 @@ class Box(Element, List):
 
 
     ## ------------------------------------------
-    def create_subbox_array(columns, rows, left_margin=0, right_margin=0, bottom_margin=0, top_margin=0):
+    def create_subbox_array(self, columns, rows, left_margin=0, right_margin=0, bottom_margin=0, top_margin=0):
         """
         Creates an array of sub-boxes, margins are specified a as fraction of the maximum
         width/height a subbox can take
@@ -146,6 +152,48 @@ class Box(Element, List):
                 subbox.parent = self
 
                 self.append(subbox)
+
+
+    ## ------------------------------------------
+    def render(self):
+        """
+        Renders the box to svg
+        """
+
+        ## Creates the group that will contain everything in the box
+        self.xml = etree.element('g')
+
+        ## Creates the background rectangle
+        background = etree.element('rect')
+
+        ## Set background attributes
+        background.attrib['x']      = self.x0
+        background.attrib['y']      = self.y0
+        background.attrib['width']  = self.x1 - self.x0
+        background.attrib['height'] = self.y1 - self.y0
+
+        background.attrib['fill'] = self.fill
+        if not self.stroke is None:
+            background.attrib['stroke'] = self.stroke
+            if not self.stroke_width is None:
+                background.attrib['stroke-width'] = self.stroke_width
+
+        ## Append background first in the group (such that it IS the background to everything else)
+        self.xml.append(background)
+
+        ## Now render the primitives included in the current box
+        self.render_point_coordinates()
+
+        for primitive in self.primitives:
+            primitive.render()
+            self.xml.append(primitive.xml)
+
+        ## Now render the subboxes:
+        for box in self:
+            box.render()
+            self.xml.append(box.xml)
+
+
 
 
 

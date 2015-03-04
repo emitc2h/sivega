@@ -42,3 +42,61 @@ class Canvas(Box):
         self.height = height
 
         super(Canvas, self).__init__(0, 0, width, height)
+
+
+    ## ------------------------------------------
+    def render(self):
+        """
+        Renders the canvas to xml
+        """
+
+        ## Creates the group that will contain everything in the box
+        self.xml = etree.element('svg')
+        self.xml.attrib['width']  = self.width
+        self.xml.attrib['height'] = self.height
+
+        ## Collect definitions
+
+        ## Creates the background rectangle
+        background = etree.element('rect')
+
+        ## Set background attributes
+        background.attrib['x']      = self.x0
+        background.attrib['y']      = self.y0
+        background.attrib['width']  = self.x1 - self.x0
+        background.attrib['height'] = self.y1 - self.y0
+
+        background.attrib['fill'] = self.fill
+        if not self.stroke is None:
+            background.attrib['stroke'] = self.stroke
+            if not self.stroke_width is None:
+                background.attrib['stroke-width'] = self.stroke_width
+
+        ## Append background first in the group (such that it IS the background to everything else)
+        self.xml.append(background)
+
+        ## Now render the primitives included in the current box
+        self.render_point_coordinates()
+
+        for primitive in self.primitives:
+            primitive.render()
+            self.xml.append(primitive.xml)
+
+        ## Now render the subboxes:
+        for box in self:
+            box.render()
+            self.xml.append(box.xml)
+
+
+    ## ------------------------------------------
+    def draw(self, name, extension='svg'):
+        """
+        Draw the canvas
+        """
+
+        self.render()
+
+        if extension == 'svg':
+            output_file = open('{0}.{1}'.format(name, extension))
+            
+
