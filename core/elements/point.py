@@ -29,7 +29,7 @@
 class Point(object):
 
     ## ------------------------------------------
-    def __init__(self, x, y, system='abs'):
+    def __init__(self, x, y, coordinates='abs'):
         """
         Constructor
         """
@@ -39,7 +39,7 @@ class Point(object):
         self.y = y
 
         ## Coordinate system for x & y
-        self.system = system
+        self.coordinates = coordinates
 
         ## Corresponding absolute coordinates, calculated during rendering
         self.abs_x = None

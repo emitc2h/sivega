@@ -26,6 +26,7 @@
 #############################################################################
 
 from lxml import etree
+import cairosvg
 
 from box import Box
 
@@ -51,43 +52,24 @@ class Canvas(Box):
         """
 
         ## Creates the group that will contain everything in the box
-        self.xml = etree.Element('svg')
-        self.xml.attrib['width']  = str(self.width)
-        self.xml.attrib['height'] = str(self.height)
-        self.xml.attrib['viewbox'] = '0 0 {0} {1}'.format(self.width, self.height)
-        self.xml.attrib['xmlns'] = 'http://www.w3.org/2000/svg'
+        self.svg = etree.Element('svg')
+        self.svg.attrib['width']  = str(self.width)
+        self.svg.attrib['height'] = str(self.height)
+        self.svg.attrib['viewbox'] = '0 0 {0} {1}'.format(self.width, self.height)
+        self.svg.attrib['xmlns'] = 'http://www.w3.org/2000/svg'
+
+        definitions = super(Canvas, self).render()
 
         ## Collect definitions
+        if definitions:
+            self.defs = etree.Element('defs')
+            for definition in definitions:
+                self.defs.append(definition.xml)
+            self.svg.append(self.defs)
 
-        ## Creates the background rectangle
-        background = etree.Element('rect')
-
-        ## Set background attributes
-        background.attrib['x']      = '0'
-        background.attrib['y']      = '0'
-        background.attrib['width']  = str(self.width)
-        background.attrib['height'] = str(self.height)
-
-        background.attrib['fill'] = self.fill
-        if not self.stroke is None:
-            background.attrib['stroke'] = self.stroke
-            if not self.stroke_width is None:
-                background.attrib['stroke-width'] = str(self.stroke_width)
-
-        ## Append background first in the group (such that it IS the background to everything else)
-        self.xml.append(background)
-
-        ## Now render the primitives included in the current box
-        self.render_point_coordinates()
-
-        for primitive in self.primitives:
-            primitive.render()
-            self.xml.append(primitive.xml)
-
-        ## Now render the subboxes:
-        for box in self:
-            box.render()
-            self.xml.append(box.xml)
+        ## Transform master group to cartesian coordinates
+        self.xml.attrib['transform'] = 'translate(0,{0}) scale(1,-1)'.format(self.height)
+        self.svg.append(self.xml)
 
 
     ## ------------------------------------------
@@ -100,8 +82,15 @@ class Canvas(Box):
 
         if extension == 'svg':
             output_file = open('{0}.{1}'.format(name, extension), 'w')
-            output_file.write(etree.tostring(self.xml))
+            output_file.write(etree.tostring(self.svg, pretty_print=True))
             output_file.close()
+
+        elif extension == 'png':
+            pass
+        elif extension == 'pdf':
+            pass
+        elif extension == 'eps':
+            pass
         else:
             print 'File not produced. Extension {0} unknown.'.format(extension)
 

@@ -28,6 +28,7 @@
 from lxml import etree
 from element import Element
 from ..styles import color
+from axis import Axis
 
 ####################################################
 class Box(Element, list):
@@ -50,8 +51,11 @@ class Box(Element, list):
         self.x1 = x1
         self.y1 = y1
 
+        self.width  = float(self.x1 - self.x0)
+        self.height = float(self.y1 - self.y0)
+
         ## Specify basic coordinate systems
-        self.coordinates = {
+        self.coordinate_systems = {
                             'rel' : ((0,0), (1,1)),
                             'abs' : ((x0,y0), (x1,y1))
                             }
@@ -71,7 +75,7 @@ class Box(Element, list):
         Set the scaled coordinate system
         """
 
-        self.coordinates[name] = ((x0,y0),(x1,y1))
+        self.coordinate_systems[name] = ((x0,y0),(x1,y1))
 
 
     ## ------------------------------------------
@@ -83,15 +87,15 @@ class Box(Element, list):
         for primitive in self.primitives:
             for point in primitive.points:
 
-                x0_abs = self.coordinates['abs'][0][0]
-                y0_abs = self.coordinates['abs'][0][1]
-                x1_abs = self.coordinates['abs'][1][0]
-                y1_abs = self.coordinates['abs'][1][1]
+                x0_abs = self.coordinate_systems['abs'][0][0]
+                y0_abs = self.coordinate_systems['abs'][0][1]
+                x1_abs = self.coordinate_systems['abs'][1][0]
+                y1_abs = self.coordinate_systems['abs'][1][1]
 
-                x0_point = self.coordinates[point.system][0][0]
-                y0_point = self.coordinates[point.system][0][1]
-                x1_point = self.coordinates[point.system][1][0]
-                y1_point = self.coordinates[point.system][1][1]
+                x0_point = self.coordinate_systems[point.coordinates][0][0]
+                y0_point = self.coordinate_systems[point.coordinates][0][1]
+                x1_point = self.coordinate_systems[point.coordinates][1][0]
+                y1_point = self.coordinate_systems[point.coordinates][1][1]
 
                 a = (x1_abs - x0_abs) / (x1_point - x0_point)
                 b = (x1_point*x0_abs - x0_point*x1_abs) / (x1_point - x0_point)
@@ -109,15 +113,11 @@ class Box(Element, list):
         Creates a sub-box, margins are specified as fractions of total width/height
         """
 
-        width = float(self.x1 - self.x0)
+        x0 = self.x0 + left_margin * self.width
+        x1 = self.x1 - right_margin * self.width
 
-        x0 = self.x0 + left_margin * width
-        x1 = self.x1 - right_margin * width
-
-        height = float(self.y1 - self.y0)
-
-        y0 = self.y0 + bottom_margin * height
-        y1 = self.y1 - top_margin * height
+        y0 = self.y0 + bottom_margin * self.height
+        y1 = self.y1 - top_margin * self.height
 
         subbox = Box(x0,y0, x1,y1)
         subbox.parent = self
@@ -136,11 +136,8 @@ class Box(Element, list):
 
         subbox_array = []
 
-        width = float(self.x1 - self.x0)
-        height = float(self.y1 - self.y0)
-
-        subbox_width  = width/columns
-        subbox_height = height/rows
+        subbox_width  = self.width/columns
+        subbox_height = self.height/rows
 
         for i in range(columns):
             for j in range(rows):
@@ -148,8 +145,8 @@ class Box(Element, list):
                 x0 = subbox_width*i + left_margin * subbox_width + self.x0
                 x1 = subbox_width*(i+1) - right_margin * subbox_width + self.x0
 
-                y0 = (height - subbox_height*(j+1)) + bottom_margin * subbox_height + self.y0
-                y1 = (height - subbox_height*j)     - top_margin * subbox_height + self.y0
+                y0 = (self.height - subbox_height*(j+1)) + bottom_margin * subbox_height + self.y0
+                y1 = (self.height - subbox_height*j)     - top_margin * subbox_height + self.y0
 
                 subbox = Box(x0,y0, x1,y1)
                 subbox.parent = self
@@ -159,6 +156,19 @@ class Box(Element, list):
                 subbox_array.append(subbox)
 
         return subbox_array
+
+
+    ## ------------------------------------------
+    def create_axes(self, coordinates):
+        """
+        Create axes bounding the box
+        """
+
+        for edge in ['bottom', 'right', 'top', 'left']:
+            axis = Axis(edge, coordinates)
+            axis.parent = self
+            axis.generate_ticks()
+            self.primitives.append(axis)
 
 
     ## ------------------------------------------
@@ -191,14 +201,18 @@ class Box(Element, list):
         ## Now render the primitives included in the current box
         self.render_point_coordinates()
 
+        definitions = []
+
         for primitive in self.primitives:
-            primitive.render()
+            definitions += primitive.render()
             self.xml.append(primitive.xml)
 
         ## Now render the subboxes:
         for box in self:
-            box.render()
+            definitions += box.render()
             self.xml.append(box.xml)
+
+        return definitions
 
 
 

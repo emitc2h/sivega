@@ -38,4 +38,19 @@ class Primitive(Element):
         """
 
         self.points = []
+        self.definitions = []
+
+        super(Primitive, self).__init__()
+
+
+    ## ------------------------------------------
+    def render(self):
+        """
+        Render definitions
+        """
+
+        for definition in self.definitions:
+            definition.render()
+
+        return self.definitions
 

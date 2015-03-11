@@ -1,9 +1,9 @@
 #**************************************************#
-# file   : core/elements/definition.py             #
+# file   : core/elements/tick.py                   #
 # author : Michel Trottier-McDonald                #
 # date   : February 2015                           #
 # description:                                     #
-# A base class for svg definitions                 #
+# A definition for an axis tick                    #
 #**************************************************#
 
 #############################################################################
@@ -26,31 +26,53 @@
 #############################################################################
 
 from lxml import etree
-from element import Element
+from definition import Definition
+from ..styles import color
 
 ####################################################
-class Definition(Element):
+class Tick(Definition):
 
     ## ------------------------------------------
-    def __init__(self):
+    def __init__(self, stroke=color.black, stroke_width=2, length=5):
         """
         Constructor
         """
 
-        self.xml_id = None
+        self.stroke       = stroke
+        self.stroke_width = stroke_width
+        self.length       = length
 
-        super(Definition, self).__init__()
+        super(Tick, self).__init__()
+
+        ## Generate ID
+        self.xml_id = 'tick.{0}.{1}.{2}'.format(self.stroke.lstrip('#'), self.stroke_width, self.length)
 
 
     ## ------------------------------------------
-    def compare(self, other):
+    def render(self):
         """
-        Compare two definitions to see if equivalent
+        Renders the tick definition
         """
 
-        if self.xml_id == other.xml_id:
-            return True
+        ## Generate line
+        line = etree.Element('line')
+        line.attrib['x1'] = '0'
+        line.attrib['y1'] = '0'
+        line.attrib['x2'] = '0'
+        line.attrib['y2'] = '{0}'.format(self.length)
+        line.attrib['stroke'] = self.stroke
+        line.attrib['stroke-width'] = '{0}'.format(self.stroke_width)
 
-        return False
+        ## Generate the marker
+        self.xml = etree.Element('marker')
+        self.xml.attrib['id'] = self.xml_id
+        self.xml.attrib['markerWidth'] = '5'
+        self.xml.attrib['markerHeight'] = '{0}'.format(self.length)
+        self.xml.attrib['orient'] = 'auto'
+
+        self.xml.append(line)
+
+
+
 
 
