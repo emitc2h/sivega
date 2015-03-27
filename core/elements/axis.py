@@ -27,12 +27,13 @@
 
 from lxml import etree
 from primitive import Primitive
+from composite import Composite
 from tick import Tick
 from point import Point
 from ..styles import color
 
 ####################################################
-class Axis(Primitive):
+class Comb(Primitive):
 
     vertical_tick_density   = 50.0/600 ## Assuming default canvas size of 800x600 pixels
     horizontal_tick_density = 40.0/800 ## is adjusted for aspect-ratio
@@ -50,14 +51,16 @@ class Axis(Primitive):
         self.axis_stroke       = color.black
         self.axis_stroke_width = 3
 
+        self.labels         = labels
+        self.labels_offset  = 3
+        self.labels_size    = 5
+        self.labels_strings = []
 
         ## Assert that the edge provided is one of the 4 possible edges
         self.edge        = edge
         self.coordinates = coordinates
         self.divisions   = divisions
         self.logarithmic = logarithmic
-        self.labels      = labels
-        self.text_labels = []
 
         super(Axis, self).__init__()
 
@@ -141,6 +144,10 @@ class Axis(Primitive):
         self.xml.attrib['marker-mid'] = 'url(#{0})'.format(new_tick.xml_id)
 
         return super(Axis, self).render()
+
+
+####################################################
+class Axis(Composite):
 
 
 

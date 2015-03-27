@@ -1,4 +1,6 @@
 from core.elements.canvas import Canvas
+from core.elements.text import Text
+from core.elements.point import Point
 
 from core.styles import color
 
@@ -21,6 +23,12 @@ plot_ratio_subboxes = plot_ratio.create_subbox_array(2, 1, 0.05, 0.05)
 plot_ratio_subboxes[0].fill = color.green
 plot_ratio_subboxes[0].create_axes('abs')
 plot_ratio_subboxes[1].fill = color.yellow
+
+text_main = Text('Main box', Point(0.5, 0.5, 'rel'))
+text_main.weight = 'bold'
+text_main.size = 32
+text_main.anchor = 'middle'
+plot_main.primitives.append(text_main)
 
 c.draw('test', 'svg')
 

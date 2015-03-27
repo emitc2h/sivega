@@ -60,6 +60,9 @@ class Canvas(Box):
 
         definitions = super(Canvas, self).render()
 
+        ## Flip primitives
+        self.flip(self.height)
+
         ## Collect definitions
         if definitions:
             self.defs = etree.Element('defs')

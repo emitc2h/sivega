@@ -39,6 +39,7 @@ class Primitive(Element):
 
         self.points = []
         self.definitions = []
+        self.flipped = False
 
         super(Primitive, self).__init__()
 
@@ -54,3 +55,17 @@ class Primitive(Element):
 
         return self.definitions
 
+
+    ## ------------------------------------------
+    def flip(self, height):
+        """
+        flip upside-down to compensation for transformation to cartesian coordinates
+        mostly for text, to be performed after rendering
+        """
+
+        if self.flipped:
+            y = float(self.xml.attrib['y'])
+            if 'transform' in self.xml.attrib.keys():
+                self.xml.attrib['transform'] = ' '.join(['translate(0,{0}), scale(1,-1)'.format(2*y), self.xml.attrib['transform']])
+            else:
+                self.xml.attrib['transform'] = 'translate(0,{0}), scale(1,-1)'.format(2*y)

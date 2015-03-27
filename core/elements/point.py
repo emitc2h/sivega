@@ -44,3 +44,30 @@ class Point(object):
         ## Corresponding absolute coordinates, calculated during rendering
         self.abs_x = None
         self.abs_y = None
+
+
+    ## ------------------------------------------
+    def get_xy_for_coordinates(self, coordinates):
+        """
+        return the point coordinate in the given coordinate system
+        """
+
+        return self.x, self,y
+
+
+    ## ------------------------------------------
+    def get_x_for_coordinates(self, coordinates):
+        """
+        return the x coordinate in the given coordinate system
+        """
+
+        return self.x
+
+
+    ## ------------------------------------------
+    def get_y_for_coordinates(self, coordinates):
+        """
+        return the x coordinate in the given coordinate system
+        """
+
+        return self.y

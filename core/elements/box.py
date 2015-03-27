@@ -215,6 +215,18 @@ class Box(Element, list):
         return definitions
 
 
+    ## ------------------------------------------
+    def flip(self, height):
+        """
+        flip primitives that need to be flipped
+        """
+
+        for primitive in self.primitives:
+            primitive.flip(height)
+
+        for box in self:
+            box.flip(height)
+
 
 
 
