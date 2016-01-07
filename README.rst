@@ -21,8 +21,8 @@ Another goal is to preserve the ROOT data structure, such that operations on his
 be done in the traditional way. However, sivega completely replaces the ROOT rendering engine, so
 no more calls to ROOT's canvases, styles, and colors are necessary.
 
-ROOT currently has the capability of converting its output to SVG, and is therefore very limited
-in the opportunities that SVG offers. Sivega working with native SVG allows for easy interfacing
+ROOT currently has the capability of converting its output to SVG, but it produces a flat .svg,
+which is difficult to use in an svg editor. Working with native SVG allows for easy interfacing
 with HTML and XML, offering the tantalizing possibility of interactive plots on the web. It also
 allows to produce lightweight SVG files which can be easily integrated and subsequently modified
 in vector graphics editors such as Adobe Illustrator and Inkscape. Another exciting possibility
