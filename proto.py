@@ -28,7 +28,7 @@ text_main = Text('Main box', Point(0.5, 0.5, 'rel'))
 text_main.weight = 'bold'
 text_main.size = 32
 text_main.anchor = 'middle'
-plot_main.primitives.append(text_main)
+plot_main.add(text_main)
 
 c.draw('test', 'svg')
 

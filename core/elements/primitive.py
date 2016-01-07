@@ -45,6 +45,34 @@ class Primitive(Element):
 
 
     ## ------------------------------------------
+    def render_point_coordinates(self):
+        """
+        Returns the absolute coordinates corresponding to the given point
+        """
+
+        for point in self.points:
+
+            x0_abs = self.parent_box.coordinate_systems['abs'][0][0]
+            y0_abs = self.parent_box.coordinate_systems['abs'][0][1]
+            x1_abs = self.parent_box.coordinate_systems['abs'][1][0]
+            y1_abs = self.parent_box.coordinate_systems['abs'][1][1]
+
+            x0_point = self.parent_box.coordinate_systems[point.coordinates][0][0]
+            y0_point = self.parent_box.coordinate_systems[point.coordinates][0][1]
+            x1_point = self.parent_box.coordinate_systems[point.coordinates][1][0]
+            y1_point = self.parent_box.coordinate_systems[point.coordinates][1][1]
+
+            a = (x1_abs - x0_abs) / (x1_point - x0_point)
+            b = (x1_point*x0_abs - x0_point*x1_abs) / (x1_point - x0_point)
+
+            c = (y1_abs - y0_abs) / (y1_point - y0_point)
+            d = (y1_point*y0_abs - y0_point*y1_abs) / (y1_point - y0_point)
+
+            point.abs_x = a*point.x + b
+            point.abs_y = c*point.y + d
+
+
+    ## ------------------------------------------
     def render(self):
         """
         Render definitions

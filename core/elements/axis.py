@@ -62,7 +62,7 @@ class Comb(Primitive):
         self.divisions   = divisions
         self.logarithmic = logarithmic
 
-        super(Axis, self).__init__()
+        super(Comb, self).__init__()
 
 
     ## ------------------------------------------
@@ -74,18 +74,18 @@ class Comb(Primitive):
         ## Automatically generate a sensible number of divisions
         if self.divisions is None:
             if self.edge == 'top' or self.edge == 'bottom':
-                self.divisions = int(self.parent.width*Axis.horizontal_tick_density)
+                self.divisions = int(self.parent_box.width*Comb.horizontal_tick_density)
             else:
-                self.divisions = int(self.parent.height*Axis.vertical_tick_density)
+                self.divisions = int(self.parent_box.height*Comb.vertical_tick_density)
 
 
         ## Figure out axis range and increments
         if self.edge == 'top' or self.edge == 'bottom':
-            k0 = self.parent.coordinate_systems[self.coordinates][0][0]
-            k1 = self.parent.coordinate_systems[self.coordinates][1][0]
+            k0 = self.parent_box.coordinate_systems[self.coordinates][0][0]
+            k1 = self.parent_box.coordinate_systems[self.coordinates][1][0]
         else:
-            k0 = self.parent.coordinate_systems[self.coordinates][0][1]
-            k1 = self.parent.coordinate_systems[self.coordinates][1][1]
+            k0 = self.parent_box.coordinate_systems[self.coordinates][0][1]
+            k1 = self.parent_box.coordinate_systems[self.coordinates][1][1]
 
         length = abs(k1-k0)
         origin = k0
@@ -93,22 +93,22 @@ class Comb(Primitive):
 
         ## Generate points
         if self.edge == 'bottom':
-            h0 = self.parent.coordinate_systems[self.coordinates][0][1]
+            h0 = self.parent_box.coordinate_systems[self.coordinates][0][1]
             for i in range(self.divisions + 1):
                 self.points.append(Point(k0 + i*increment, h0, self.coordinates))
 
         if self.edge == 'right':
-            h0 = self.parent.coordinate_systems[self.coordinates][1][0]
+            h0 = self.parent_box.coordinate_systems[self.coordinates][1][0]
             for i in range(self.divisions + 1):
                 self.points.append(Point(h0, k0 + i*increment, self.coordinates))
 
         if self.edge == 'top':
-            h0 = self.parent.coordinate_systems[self.coordinates][1][1]
+            h0 = self.parent_box.coordinate_systems[self.coordinates][1][1]
             for i in range(self.divisions + 1):
                 self.points.append(Point(k0 + length - i*increment, h0, self.coordinates))
 
         if self.edge == 'left':
-            h0 = self.parent.coordinate_systems[self.coordinates][0][0]
+            h0 = self.parent_box.coordinate_systems[self.coordinates][0][0]
             for i in range(self.divisions + 1):
                 self.points.append(Point(h0, k0 + length - i*increment, self.coordinates))
 
@@ -143,11 +143,42 @@ class Comb(Primitive):
         self.xml.attrib['stroke-width'] = '{0}'.format(self.axis_stroke_width)
         self.xml.attrib['marker-mid'] = 'url(#{0})'.format(new_tick.xml_id)
 
-        return super(Axis, self).render()
+        return super(Comb, self).render()
+
+
 
 
 ####################################################
 class Axis(Composite):
+    """
+    An axis object, containing at least one comb, an axis title, and tick labels
+    """
+
+    ## ------------------------------------------
+    def __init__(self, edge, coordinates):
+        """
+        Constructor
+        """
+
+        super(Axis, self).__init__()
+
+        self.combs = [Comb(edge, coordinates)]
+
+        self.primitives.extend(self.combs)
+
+
+    ## ------------------------------------------
+    def set_parent_box(self, parent_box):
+        """
+        Sets the parent box and react accordingly
+        """
+
+        super(Axis, self).set_parent_box(parent_box)
+
+        for comb in self.combs:
+            comb.generate_ticks()
+
+
 
 
 

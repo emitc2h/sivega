@@ -38,7 +38,16 @@ class Element(object):
 
         self.xml = None
 
-        self.parent = None
+        self.parent_box = None
+
+
+    ## ------------------------------------------
+    def set_parent_box(self, parent_box):
+        """
+        Sets the parent and react accordingly
+        """
+
+        self.parent_box = parent_box
 
 
     ## ------------------------------------------

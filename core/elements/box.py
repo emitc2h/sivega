@@ -35,7 +35,7 @@ class Box(Element, list):
 
 
     ## ------------------------------------------
-    def __init__(self, x0,y0, x1,y1, parent=None):
+    def __init__(self, x0,y0, x1,y1, parent_box=None):
         """
         Constructor
         """
@@ -44,7 +44,7 @@ class Box(Element, list):
         super(Box, self).__init__()
 
         ## Link to parent box
-        self.parent = parent
+        self.set_parent_box = parent_box
 
         self.x0 = x0
         self.y0 = y0
@@ -60,8 +60,8 @@ class Box(Element, list):
                             'abs' : ((x0,y0), (x1,y1))
                             }
 
-        ## List of primitives
-        self.primitives = []
+        ## List of elements
+        self.elements = []
 
         ## graphical attributes
         self.fill   = color.white
@@ -84,27 +84,8 @@ class Box(Element, list):
         Returns the absolute coordinates corresponding to the given point
         """
 
-        for primitive in self.primitives:
-            for point in primitive.points:
-
-                x0_abs = self.coordinate_systems['abs'][0][0]
-                y0_abs = self.coordinate_systems['abs'][0][1]
-                x1_abs = self.coordinate_systems['abs'][1][0]
-                y1_abs = self.coordinate_systems['abs'][1][1]
-
-                x0_point = self.coordinate_systems[point.coordinates][0][0]
-                y0_point = self.coordinate_systems[point.coordinates][0][1]
-                x1_point = self.coordinate_systems[point.coordinates][1][0]
-                y1_point = self.coordinate_systems[point.coordinates][1][1]
-
-                a = (x1_abs - x0_abs) / (x1_point - x0_point)
-                b = (x1_point*x0_abs - x0_point*x1_abs) / (x1_point - x0_point)
-
-                c = (y1_abs - y0_abs) / (y1_point - y0_point)
-                d = (y1_point*y0_abs - y0_point*y1_abs) / (y1_point - y0_point)
-
-                point.abs_x = a*point.x + b
-                point.abs_y = c*point.y + d
+        for element in self.elements:
+            element.render_point_coordinates()
 
 
     ## ------------------------------------------
@@ -119,8 +100,7 @@ class Box(Element, list):
         y0 = self.y0 + bottom_margin * self.height
         y1 = self.y1 - top_margin * self.height
 
-        subbox = Box(x0,y0, x1,y1)
-        subbox.parent = self
+        subbox = Box(x0,y0, x1,y1, self)
 
         self.append(subbox)
 
@@ -148,8 +128,7 @@ class Box(Element, list):
                 y0 = (self.height - subbox_height*(j+1)) + bottom_margin * subbox_height + self.y0
                 y1 = (self.height - subbox_height*j)     - top_margin * subbox_height + self.y0
 
-                subbox = Box(x0,y0, x1,y1)
-                subbox.parent = self
+                subbox = Box(x0,y0, x1,y1, self)
 
                 self.append(subbox)
 
@@ -166,9 +145,8 @@ class Box(Element, list):
 
         for edge in ['bottom', 'right', 'top', 'left']:
             axis = Axis(edge, coordinates)
-            axis.parent = self
-            axis.generate_ticks()
-            self.primitives.append(axis)
+            axis.set_parent_box(self)
+            self.elements.append(axis)
 
 
     ## ------------------------------------------
@@ -198,14 +176,14 @@ class Box(Element, list):
         ## Append background first in the group (such that it IS the background to everything else)
         self.xml.append(background)
 
-        ## Now render the primitives included in the current box
+        ## Now render the elements included in the current box
         self.render_point_coordinates()
 
         definitions = []
 
-        for primitive in self.primitives:
-            definitions += primitive.render()
-            self.xml.append(primitive.xml)
+        for element in self.elements:
+            definitions += element.render()
+            self.xml.append(element.xml)
 
         ## Now render the subboxes:
         for box in self:
@@ -218,14 +196,24 @@ class Box(Element, list):
     ## ------------------------------------------
     def flip(self, height):
         """
-        flip primitives that need to be flipped
+        flip elements that need to be flipped
         """
 
-        for primitive in self.primitives:
-            primitive.flip(height)
+        for element in self.elements:
+            element.flip(height)
 
         for box in self:
             box.flip(height)
+
+
+    ## ------------------------------------------
+    def add(self, element):
+        """
+        Adds an element to the box
+        """
+
+        element.set_parent_box(self)
+        self.elements.append(element)
 
 
 
