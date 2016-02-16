@@ -35,12 +35,12 @@ from primitive import Primitive
 class Text(Primitive):
 
     ## ------------------------------------------
-    def __init__(self, label, point):
+    def __init__(self, label, point, *args, **kwargs):
         """
         Constructor
         """
 
-        super(Text, self).__init__()
+        super(Text, self).__init__(*args, **kwargs)
 
         self.points.append(point)
 

@@ -31,27 +31,28 @@ from lxml import etree
 class Element(object):
 
     ## ------------------------------------------
-    def __init__(self):
+    def __init__(self, parent_box=None):
         """
         Constructor
         """
 
         self.xml = None
-
-        self.parent_box = None
-
-
-    ## ------------------------------------------
-    def set_parent_box(self, parent_box):
-        """
-        Sets the parent and react accordingly
-        """
-
         self.parent_box = parent_box
 
 
     ## ------------------------------------------
     def render(self):
         """
+        Generates the svg code for this element
         To be implemented by child classes
         """
+        pass
+
+
+    ## ------------------------------------------
+    def render_point_coordinates(self):
+        """
+        Returns the absolute coordinates corresponding to the given point
+        To be implemented by the child classes
+        """
+        pass

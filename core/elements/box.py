@@ -30,21 +30,21 @@ from element import Element
 from ..styles import color
 from axis import Axis
 
+def flat_space(x,y):
+    return x,y
+
 ####################################################
 class Box(Element, list):
 
 
     ## ------------------------------------------
-    def __init__(self, x0,y0, x1,y1, parent_box=None):
+    def __init__(self, x0,y0, x1,y1, *args, **kwargs):
         """
         Constructor
         """
 
         ## Initialize Element
-        super(Box, self).__init__()
-
-        ## Link to parent box
-        self.set_parent_box = parent_box
+        super(Box, self).__init__(*args, **kwargs)
 
         self.x0 = x0
         self.y0 = y0
@@ -56,8 +56,8 @@ class Box(Element, list):
 
         ## Specify basic coordinate systems
         self.coordinate_systems = {
-                            'rel' : ((0,0), (1,1)),
-                            'abs' : ((x0,y0), (x1,y1))
+                            'rel' : ((0,0), (1,1), flat_space),
+                            'abs' : ((x0,y0), (x1,y1), flat_space)
                             }
 
         ## List of elements
@@ -70,12 +70,12 @@ class Box(Element, list):
 
 
     ## ------------------------------------------
-    def add_scaled_coordinate_system(self, name, x0,y0, x1,y1):
+    def add_scaled_coordinate_system(self, name, x0,y0, x1,y1, space=flat_space):
         """
         Set the scaled coordinate system
         """
 
-        self.coordinate_systems[name] = ((x0,y0),(x1,y1))
+        self.coordinate_systems[name] = ((x0,y0),(x1,y1), flat_space)
 
 
     ## ------------------------------------------
@@ -100,7 +100,7 @@ class Box(Element, list):
         y0 = self.y0 + bottom_margin * self.height
         y1 = self.y1 - top_margin * self.height
 
-        subbox = Box(x0,y0, x1,y1, self)
+        subbox = Box(x0,y0, x1,y1, parent_box=self)
 
         self.append(subbox)
 
@@ -128,7 +128,7 @@ class Box(Element, list):
                 y0 = (self.height - subbox_height*(j+1)) + bottom_margin * subbox_height + self.y0
                 y1 = (self.height - subbox_height*j)     - top_margin * subbox_height + self.y0
 
-                subbox = Box(x0,y0, x1,y1, self)
+                subbox = Box(x0,y0, x1,y1, parent_box=self)
 
                 self.append(subbox)
 
@@ -144,8 +144,7 @@ class Box(Element, list):
         """
 
         for edge in ['bottom', 'right', 'top', 'left']:
-            axis = Axis(edge, coordinates)
-            axis.set_parent_box(self)
+            axis = Axis(edge, coordinates, parent_box=self)
             self.elements.append(axis)
 
 
@@ -212,7 +211,7 @@ class Box(Element, list):
         Adds an element to the box
         """
 
-        element.set_parent_box(self)
+        element.parent_box = self
         self.elements.append(element)
 
 

@@ -39,14 +39,16 @@ class Comb(Primitive):
     horizontal_tick_density = 40.0/800 ## is adjusted for aspect-ratio
 
     ## ------------------------------------------
-    def __init__(self, edge, coordinates, divisions=None, logarithmic=False, labels=False):
+    def __init__(self, edge, coordinates, divisions=None, labels=False, *args, **kwargs):
         """
         Constructor
         """
 
+        super(Comb, self).__init__(*args, **kwargs)
+
         self.tick_stroke       = color.black
         self.tick_stroke_width = 1
-        self.tick_length       = 5
+        self.tick_length       = 3
 
         self.axis_stroke       = color.black
         self.axis_stroke_width = 3
@@ -58,11 +60,12 @@ class Comb(Primitive):
 
         ## Assert that the edge provided is one of the 4 possible edges
         self.edge        = edge
-        self.coordinates = coordinates
-        self.divisions   = divisions
-        self.logarithmic = logarithmic
+        assert self.edge in ['bottom', 'right', 'top', 'left']
 
-        super(Comb, self).__init__()
+        self.coordinates = coordinates
+        assert self.coordinates in self.parent_box.coordinate_systems.keys()
+
+        self.divisions = divisions
 
 
     ## ------------------------------------------
@@ -123,6 +126,9 @@ class Comb(Primitive):
         new_tick = Tick(self.tick_stroke, self.tick_stroke_width, self.tick_length)
         self.definitions.append(new_tick)
 
+        ## Generate the ticks
+        self.generate_ticks()
+
         ## Create the path
         self.xml = etree.Element('path')
 
@@ -155,28 +161,25 @@ class Axis(Composite):
     """
 
     ## ------------------------------------------
-    def __init__(self, edge, coordinates):
+    def __init__(self, edge, coordinates, *args, **kwargs):
         """
         Constructor
         """
 
-        super(Axis, self).__init__()
+        super(Axis, self).__init__(*args, **kwargs)
 
-        self.combs = [Comb(edge, coordinates)]
+        ## Secondary comb, fine ticks
+        self.comb2 = Comb(edge, coordinates, parent_box=self.parent_box)
+        self.comb2.divisions = 30
+
+        ## Primary comb, the one corresponding to the tick labels
+        self.comb1 = Comb(edge, coordinates, parent_box=self.parent_box)
+        self.comb1.divisions = self.comb2.divisions/5
+        self.comb1.tick_length = 5
+
+        self.combs = [self.comb1, self.comb2]
 
         self.primitives.extend(self.combs)
-
-
-    ## ------------------------------------------
-    def set_parent_box(self, parent_box):
-        """
-        Sets the parent box and react accordingly
-        """
-
-        super(Axis, self).set_parent_box(parent_box)
-
-        for comb in self.combs:
-            comb.generate_ticks()
 
 
 

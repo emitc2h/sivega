@@ -32,16 +32,16 @@ from element import Element
 class Primitive(Element):
 
     ## ------------------------------------------
-    def __init__(self):
+    def __init__(self, *args, **kwargs):
         """
         Constructor
         """
 
+        super(Primitive, self).__init__(*args, **kwargs)
+
         self.points = []
         self.definitions = []
         self.flipped = False
-
-        super(Primitive, self).__init__()
 
 
     ## ------------------------------------------
@@ -52,15 +52,21 @@ class Primitive(Element):
 
         for point in self.points:
 
+            ## Retrieve the absolute coordinates of the bounding box
             x0_abs = self.parent_box.coordinate_systems['abs'][0][0]
             y0_abs = self.parent_box.coordinate_systems['abs'][0][1]
             x1_abs = self.parent_box.coordinate_systems['abs'][1][0]
             y1_abs = self.parent_box.coordinate_systems['abs'][1][1]
 
+            ## Retrieve the coordinates of the bounding box in the point's coordinate system
             x0_point = self.parent_box.coordinate_systems[point.coordinates][0][0]
             y0_point = self.parent_box.coordinate_systems[point.coordinates][0][1]
             x1_point = self.parent_box.coordinate_systems[point.coordinates][1][0]
             y1_point = self.parent_box.coordinate_systems[point.coordinates][1][1]
+
+            ## Apply the function mapping from the point's coordinates to the absolute coordinate system
+            x0_point, y0_point = self.parent_box.coordinate_systems[point.coordinates][2](x0_point, y0_point)
+            x1_point, y1_point = self.parent_box.coordinate_systems[point.coordinates][2](x1_point, y1_point)
 
             a = (x1_abs - x0_abs) / (x1_point - x0_point)
             b = (x1_point*x0_abs - x0_point*x1_abs) / (x1_point - x0_point)
@@ -68,8 +74,12 @@ class Primitive(Element):
             c = (y1_abs - y0_abs) / (y1_point - y0_point)
             d = (y1_point*y0_abs - y0_point*y1_abs) / (y1_point - y0_point)
 
-            point.abs_x = a*point.x + b
-            point.abs_y = c*point.y + d
+            point_x, point_y = self.parent_box.coordinate_systems[point.coordinates][2](point.x, point.y)
+
+            point.abs_x = a*point_x + b
+            point.abs_y = c*point_y + d
+
+            print '(', point.abs_x, point.abs_y, ') <- (', point.x, point.y, ')'
 
 
     ## ------------------------------------------
