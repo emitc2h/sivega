@@ -26,9 +26,10 @@ def log_space(x,y):
     return math.log10(x), math.log10(y)
 plot_ratio_subboxes[0].add_scaled_coordinate_system('log', 0,0, 1000,10000, space=log_space)
 plot_ratio_subboxes[0].create_axes('log')
+
 plot_ratio_subboxes[1].fill = color.yellow
 
-text_main = Text('Main box', Point(0.5, 0.5, 'rel'))
+text_main = Text('Main box', Point(0.5, 0.5, plot_main, 'rel'))
 text_main.weight = 'bold'
 text_main.size = 32
 text_main.anchor = 'middle'
