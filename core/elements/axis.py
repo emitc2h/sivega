@@ -98,22 +98,22 @@ class Comb(Primitive):
         if self.edge == 'bottom':
             h0 = self.parent_box.coordinate_systems[self.coordinates][0][1]
             for i in range(self.divisions + 1):
-                self.points.append(Point(k0 + i*increment, h0, self.parent_box, self.coordinates))
+                self.points.append(Point(origin + i*increment, h0, self.parent_box, self.coordinates))
 
         if self.edge == 'right':
             h0 = self.parent_box.coordinate_systems[self.coordinates][1][0]
             for i in range(self.divisions + 1):
-                self.points.append(Point(h0, k0 + i*increment,self.parent_box, self.coordinates))
+                self.points.append(Point(h0, origin + i*increment,self.parent_box, self.coordinates))
 
         if self.edge == 'top':
             h0 = self.parent_box.coordinate_systems[self.coordinates][1][1]
             for i in range(self.divisions + 1):
-                self.points.append(Point(k0 + length - i*increment, h0, self.parent_box, self.coordinates))
+                self.points.append(Point(origin + length - i*increment, h0, self.parent_box, self.coordinates))
 
         if self.edge == 'left':
             h0 = self.parent_box.coordinate_systems[self.coordinates][0][0]
             for i in range(self.divisions + 1):
-                self.points.append(Point(h0, k0 + length - i*increment, self.parent_box, self.coordinates))
+                self.points.append(Point(h0, origin + length - i*increment, self.parent_box, self.coordinates))
 
 
     ## ------------------------------------------

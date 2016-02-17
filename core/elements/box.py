@@ -75,7 +75,7 @@ class Box(Element, list):
         Set the scaled coordinate system
         """
 
-        self.coordinate_systems[name] = ((x0,y0),(x1,y1), flat_space)
+        self.coordinate_systems[name] = ((x0,y0),(x1,y1), space)
 
 
     ## ------------------------------------------

@@ -23,8 +23,10 @@ plot_ratio_subboxes[0].fill = color.green
 
 import math
 def log_space(x,y):
+    print x,y
     return math.log10(x), math.log10(y)
-plot_ratio_subboxes[0].add_scaled_coordinate_system('log', 0,0, 1000,10000, space=log_space)
+
+plot_ratio_subboxes[0].add_scaled_coordinate_system('log', 10,10, 1000,10000, space=log_space)
 plot_ratio_subboxes[0].create_axes('log')
 
 plot_ratio_subboxes[1].fill = color.yellow
